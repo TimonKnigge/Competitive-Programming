@@ -13,3 +13,5 @@
 *.pch
 *.vspscc
 *.vssscc
+
+*/Debug
