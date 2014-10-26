@@ -8,7 +8,7 @@ Training for programming contests.
 
 (bold is finished)
 
- - **[Aizu 2003 A](http://web-ext.u-aizu.ac.jp/conference/ACM/problems/all.pdf): O(m1 + m2) by using a linked list plus some pointers.
+ - **[Aizu 2003 A](http://web-ext.u-aizu.ac.jp/conference/ACM/problems/all.pdf)**: O(m1 + m2) by using a linked list plus some pointers.
  - **[APAC 2015 A](https://code.google.com/codejam/contest/5214486/dashboard)**: Flood-fill on a graph.
  - **[APAC 2015 B](https://code.google.com/codejam/contest/5214486/dashboard#s=p1)**: Dijkstra's, vertex splitting.
  - **[APC 2003 A](http://guan.cse.nsysu.edu.tw/acm03/problems.pdf)**: DP, longest increasing subsequence.
