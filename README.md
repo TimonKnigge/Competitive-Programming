@@ -15,6 +15,7 @@ Training for programming contests.
  - **[BAPC 2013 H](http://2013.bapc.eu/)**: Ad-hoc geometry problem.
  - **[BAPC 2013 I](http://2013.bapc.eu/)**: Ad-hoc problem. Hashmap datastructure excercise, nothing more.
  - [BAPC 2014 C](http://2014.bapc.eu/): Convex-hull + ternary search.
+ - **[GCJ Q2013 B](https://code.google.com/codejam/contest/2270488/dashboard#s=p1&a=2)**: Ad-hoc problem.
  - **[NWERC 2013 B](http://2013.nwerc.eu/)**: Ad-hoc graph problem. Observe that the size n of a chain group is 2<=n<=4.
  - **[UVA 11800](http://uva.onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&page=show_problem&problem=2900)**: Ad-hoc geometry problem.
  - **[UVA 673](http://uva.onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&page=show_problem&problem=614)**: Ad-hoc problem. Stack datastructure excercise, nothing more.
