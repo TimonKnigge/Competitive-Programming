@@ -79,7 +79,7 @@ int main(){
 		}
 	}
 
-	cout << (cycle ? "YES" : "NO") << endl;
+	cout << (cycle ? "Yes" : "No") << endl;
 
 	return 0;
 }
