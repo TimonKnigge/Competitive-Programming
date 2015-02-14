@@ -5,10 +5,6 @@
 #include <math.h>
 #include <algorithm>
 
-#ifndef _MSC_VER
-#define scanf scanf_s
-#endif
-
 using namespace std;
 
 typedef long double ld;
