@@ -116,12 +116,7 @@ int main() {
 	}
 
 	if (opencount == filled) {
-		for (int y = 0; y < m; ++y) {
-			for (int x = 0; x < n; ++x) {
-				cout << board[x][y];
-			}
-			cout << endl;
-		}
+		printBoard(n, m, board);
 	}
 	else cout << "Not unique" << endl;
 
