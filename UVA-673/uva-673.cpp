@@ -10,11 +10,13 @@ int main(){
 
 	int T;
 	cin >> T;
+	string exp;
+	getline(cin, exp);
 	while (T-- > 0){
 
 		stack<bool> st;
 		string in;
-		cin >> in;
+		getline(cin, in);
 
 		bool valid = true;
 
@@ -40,6 +42,8 @@ int main(){
 				}
 			}
 		}
+
+		valid = valid && (st.size() == 0);
 
 		cout << (valid ? "Yes" : "No") << endl;
 
