@@ -45,11 +45,10 @@ int main() {
 			int l = 0, r = 0, p = 0;
 			for (int v = 1; v < n; ++v) {
 				if (v == m) continue;
-				if (bit_is_set(mask, p))
+				if (bit_is_set(mask, p++))
 					leftroute[l++] = v;
 				else
 					rightroute[r++] = v;
-				p++;
 			}
 
 			// Test both routes
