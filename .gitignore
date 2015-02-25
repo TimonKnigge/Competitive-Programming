@@ -19,5 +19,7 @@
 *.pdb
 *.obj
 *.lastbuildstate
+*.exe
+*.ilk
 
 */Debug
