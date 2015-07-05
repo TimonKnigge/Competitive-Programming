@@ -1,6 +1,9 @@
 # personal files
 /ignore
 
+# g++
+*.out
+
 # Visual Studio stuff
 *.sln
 *.opensdf
