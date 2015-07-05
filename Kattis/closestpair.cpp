@@ -6,7 +6,7 @@
 #include <math.h>
 
 using namespace std;
-
+  
 #define INF 1e200;
 #define LLINF 9000000000000000000
 #define EPSILON 1e-6
