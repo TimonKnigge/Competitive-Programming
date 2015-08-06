@@ -28,6 +28,7 @@ typedef vector<vii> vvii;
 typedef vector<bool> vb;
 typedef long double ld;
 
+// Dijkstra
 void dijkstra(vvii &edges, int s, vi &dist) {
     dist.assign(edges.size(), LLINF);
     priority_queue<ii, vector<ii>, greater<ii>> pq;
@@ -46,45 +47,48 @@ void dijkstra(vvii &edges, int s, vi &dist) {
         }
     }
 }
+// -Dijkstra
 
-
+// Toposort
 int s_ix = 0;
 void visit (int u, vvi &edges, vb &visited, vi &sorted) {
     visited[u] = true;
     for (int v : edges[u]) if (!visited[v]) visit(v, edges, visited, sorted);
     sorted[s_ix--] = u;
 }
+// -Toposort
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     
     int n, m, s, t;
-    cin >> n >> m >> s >> t; s--; t--;
+    cin >> n >> m >> s >> t; 
+    s--; t--;
+
     vvii edges(n, vii()), rev_edges(n, vii());
     vvi edgesid(n, vi());
     for (int i = 0; i < m; ++i) {
         ll a, b, l; cin >> a >> b >> l;
         edges[a - 1].push_back({b - 1, l});
-        edgesid[a-1].push_back(i);
+        edgesid[a - 1].push_back(i);
         rev_edges[b - 1].push_back({a - 1, l});
     }
     vi sdist, tdist;
     dijkstra(edges, s, sdist);
     dijkstra(rev_edges, t, tdist);
 
-
-    vector<ll> ____status(m, 0), val(m, -10);
-    vvi sh_edges(n, vi()), sh_edgesid(n, vi());
+    vector<ll> status(m, 0), val(m, -10);
+    vvi sh_edges(n, vi()), sh_edgesid(n, vi()); // Shortest path graph
     for (int u = 0; u < n; ++u) {
-        for (int j =0; j < edges[u].size(); ++j) {
+        for (int j = 0; j < edges[u].size(); ++j) {
             auto vv = edges[u][j];
             int v = vv.first;
             pair<int, ll> info = {edgesid[u][j], vv.second};
             ll l = info.second;
             ll mm = sdist[u] + tdist[v] + l - sdist[t];
             if (sdist[u] == LLINF || tdist[v] == LLINF) continue;
-            if (mm < l - 1) { ____status[info.first] = 1; val[info.first] = mm; }
+            if (mm < l - 1) { status[info.first] = 1; val[info.first] = mm; }
             if (mm == 0){ sh_edges[u].push_back(v); sh_edgesid[u].push_back(info.first); }
         }
     }
@@ -92,7 +96,8 @@ int main(){
     vi sortedinv(n, -1);
     vb visited(n, false);
     s_ix = n - 1;
-    visit(s, sh_edges, visited, sorted);
+    visit(s, sh_edges, visited, sorted); // Toposort from s
+    // Invert the sorting
     for (int i = 0; i < n; ++i) if(sorted[i] != -1) sortedinv[sorted[i]] = i;
     vb is_art_point(n, false);
     visited.assign(n, false);
@@ -113,14 +118,14 @@ int main(){
             int v = sh_edges[u][j];
             if (!is_art_point[v]) continue;
             if (sh_edges[u].size() > 1) continue;
-            ____status[sh_edgesid[u][j]] = 2;
+            status[sh_edgesid[u][j]] = 2;
         }
     }
 
     for (int i = 0; i < m; ++i) {
-        if (____status[i] == 0 || (val[i] == -10 && ____status[i] == 1)) cout << "NO\n";
-        if (____status[i] == 1) cout << "CAN " << (val[i] + 1) << '\n';
-        if (____status[i] == 2) cout << "YES\n";
+        if (status[i] == 0 || (val[i] == -10 && status[i] == 1)) cout << "NO\n";
+        if (status[i] == 1) cout << "CAN " << (val[i] + 1) << '\n';
+        if (status[i] == 2) cout << "YES\n";
     }
     return 0;
 }
