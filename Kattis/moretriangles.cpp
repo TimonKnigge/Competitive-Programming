@@ -107,17 +107,24 @@ void square_in_place(vector<Complex> &A) {
 	fft(A, N, p, true);
 }
 
+ll pw(ll i, int k, ll n) {
+	if (k == 0) return 1;
+	if (k == 1) return i % n;
+	if (k % 2 == 0) return pw((i*i) % n, k / 2, n);
+	else return (i * pw((i*i) % n, k / 2, n)) % n;
+}
+
 int main(){
 	ios::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	int n;
-	cin >> n;
+	int n, k;
+	cin >> n >> k;
 
 	vector<ll> sq(n, 0), dsq(n, 0);
 	for (ll i = 1; i < n; ++i) {
-		sq[(i * i) % n]++;
-		dsq[(i * i * 2) % n]++;
+		sq[pw(i, k, n) % n]++;
+		dsq[(pw(i, k, n) * 2) % n]++;
 	}
 
 	vector<Complex> A, B, C;

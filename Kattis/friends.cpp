@@ -26,13 +26,10 @@ bool iszero(uint128 const &v) {
 }
 int fnonzero(uint128 const &v) {
 	// Assumes !iszero(v)!
-	int i = 0;
-	unsigned long long u = (v.i1 == 0 ? v.i2 : v.i1);
-	for (; i < 64; ++i) {
-		if ((u&1)==1) break;
-		u >>= 1;
-	}
-	return (i + (v.i1 == 0 ? 64 : 0));
+	if (v.i1 == 0)
+		return (64 + __builtin_ctzll(v.i2));
+	else
+		return __builtin_ctzll(v.i1);
 }
 bool bitset(uint128 const &v, int b) {
 	if (b < 64) return (((v.i1 >> b) & 1) == 1);
@@ -65,14 +62,14 @@ int BronKerbosch2(uint128 P) {
 		if (iszero(rpx.P) && iszero(rpx.X))
 			r++;
 		else {
-			int u = fnonzero(rpx.P | X);
+			int u = fnonzero(rpx.P | rpx.X);
 			for (int v = 0; v < n; ++v) {
 				if (!bitset(rpx.P, v)) continue;
 				if (adj[u][v]) continue;
 				uint128 vv = set1(v);
 				st.push({rpx.R | vv, rpx.P & N[v], rpx.X & N[v]});
 				rpx.P = (rpx.P &~ vv);
-				rpx.X = (X | vv);
+				rpx.X = (rpx.X | vv);
 			}
 		}
 		
@@ -84,7 +81,6 @@ int BronKerbosch2(uint128 P) {
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(NULL);
-	
 	while (cin >> n) {
 		int m;
 		cin >> m;
@@ -102,7 +98,7 @@ int main() {
 			int a, b;
 			cin >> a >> b;
 			a--; b--;
-			adj[a][b] = true;
+			adj[a][b] = adj[b][a] = true;
 			N[a] = (N[a] | set1(b));
 			N[b] = (N[b] | set1(a));
 		}
@@ -112,8 +108,8 @@ int main() {
 			cout << "Too many maximal sets of friends.\n";
 		else
 			cout << res << '\n';
-		cout << flush;
 	}
+	cout << flush;
 	
 	return 0;
 }
