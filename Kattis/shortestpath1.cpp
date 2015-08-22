@@ -14,20 +14,19 @@ typedef vector<vil> vvil;
 
 const ll LLINF = 2e18;
 
-void readn(register int *n) {
-	int sign = 1;
+int rd() {
+	int n = 0, sign = 1;
 	register char c;
-	*n = 0;
 	while ((c = getc_unlocked(stdin)) != '\n') {
 		switch(c) {
 			case '-': sign = -1; break;
 			case ' ': goto hell;
 			case '\n': goto hell;
-			default: *n *= 10; *n += c - '0'; break;
+			default: n *= 10; n += c - '0'; break;
 		}
 	}
 hell:
-	*n *= sign;
+	return n * sign;
 }
 
 void dijkstra(vvil &e, int s, vl &d, int Q) {
@@ -37,8 +36,7 @@ void dijkstra(vvil &e, int s, vl &d, int Q) {
 	pq.push({0, s});
 	d[s] = 0;
 
-	int ask;
-	readn(&ask);
+	int ask = rd();
 
 	while (!pq.empty()) {
 		ll w = pq.top().first;
@@ -51,7 +49,7 @@ void dijkstra(vvil &e, int s, vl &d, int Q) {
 				cout << d[ask] << '\n';
 				Q--;
 				if (Q == 0) return;
-				readn(&ask);
+				ask = rd();
 			}
 		}
 		if (d[u] < w) continue;
@@ -68,7 +66,7 @@ void dijkstra(vvil &e, int s, vl &d, int Q) {
 	for (; Q > 0; --Q) {
 		if (!ex[ask]) cout << "Impossible\n";
 		else cout << d[ask] << '\n';
-		if (Q > 1) readn(&ask);
+		if (Q > 1) ask = rd();
 	}
 }
 
@@ -78,17 +76,17 @@ int main() {
 	
 	while (true) {
 		int n, m, q, s;
-		readn(&n);
-		readn(&m);
-		readn(&q);
-		readn(&s);
+		n = rd();
+		m = rd();
+		q = rd();
+		s = rd();
 		if (n == 0) break;
 		vvil e(n, vil());
 		for (int i = 0; i < m; ++i) {
 			int u, v; int w;
-			readn(&u);
-			readn(&v);
-			readn(&w);
+			u = rd();
+			v = rd();
+			w = rd();
 			e[u].push_back({v, ll(w)});
 		}
 	
