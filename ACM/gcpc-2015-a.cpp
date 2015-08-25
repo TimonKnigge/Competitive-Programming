@@ -40,8 +40,9 @@ int main() {
 	int N, P, M, G, T;
 	cin >> N >> P >> M >> G >> T;
 	
-	vector<int> pvisit(P, -1);
-	for (int i = 0; i < P; ++i) {
+	P++;
+	vector<int> pvisit(P, 0);
+	for (int i = 1; i < P; ++i) {
 		int _t;
 		cin >> pvisit[i] >> _t;
 		G -= _t;
@@ -116,7 +117,6 @@ int main() {
 	}
 
 	bool pz = false, pm = false;
-	if (P == 1 && G >= 0) pz = true;
 	if (minz <= G) pz = true;
 	if (minm <= G) pm = true;
 
