@@ -50,7 +50,7 @@ struct FlowNetwork {
 	ll dinic_augment(int s, int t, int *d, ll cap);
 };
 
-#define MAXV 2005
+#define MAXV 4050
 ll FlowNetwork::dinic_augment(int s, int t, int *d, ll cap) {
 	if (s == t) return cap;
 	ll f = 0, df = 0;
@@ -93,7 +93,7 @@ int main(){
 		cin >> k;
 		for (int j = 0; j < k; ++j) {
 			int v; cin >> v;
-			v--;
+			if (v == i) continue;
 			fn.add_edge(i, v + N, 1);
 		}
 		fn.add_edge(2 * N, i, 1);
@@ -101,6 +101,8 @@ int main(){
 	}
 
 	cout << (N -int(fn.dinic(2 * N, 2 * N + 1))) << endl;
+
+	fn.cleanup();
 	
 	return 0;
 }
