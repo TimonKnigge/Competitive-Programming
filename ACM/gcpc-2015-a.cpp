@@ -9,9 +9,11 @@ typedef vector<pair<int, long long> > el;
 typedef vector<el> ell;
 typedef pair<long long, int> PQ;
 
+const ll LLINF = 2e18;
+
 void dijkstra(ell &e, vector<ll> &d, int s) {
 	int V = e.size();
-	d.assign(V, 2e18);
+	d.assign(V, LLINF);
 	priority_queue<PQ, vector<PQ>, greater<PQ> > pq;
 	pq.push({0, s});
 	d[s] = 0;
@@ -54,30 +56,34 @@ int main() {
 	}
 
 
-	vector<vector<long long> > d(P, vector<long long>(P, 2e18));
+	vector<vector<long long> > d(P, vector<long long>(P, LLINF));
 	for (int i = 0; i < P; ++i) {
 		int s = pvisit[i];
 		vector<long long> dist;
 		dijkstra(e, dist, s);
-		for (int j = 0; j < pvisit.size(); ++j) {
+		for (int j = 0; j < P; ++j) {
 			d[i][j] = dist[pvisit[j]];
+			
+			if (dist[pvisit[j]] == LLINF) {
+				cout << "impossible" << endl;
+				return 0;
+			}
 		}
 	}
 
 
 	int taxibit = (1 << P);
-	ll LLINF = 2e18;
 	// tsp_d[eindpunt][bezochteplekken | taxibit]
-	vector<vector<long long> > tsp_d(P, vector<long long>(1 << (P + 1), 2e18));
+	vector<vector<long long> > tsp_d(P, vector<long long>(1 << (P + 1), LLINF));
 	tsp_d[0][1] = 0;
 	
 	for (int mask = 0; mask < (1 << (P + 1)); ++mask) {
 		for (int s = 0; s < P; ++s) {
-			if (((mask >> s) & 1) == 0) continue;
+			if ((mask & (1 << s)) == 0) continue;
 			if (tsp_d[s][mask] == LLINF) continue;
 			for (int t = 0; t < P; ++t) {
 				if (s == t) continue;
-				if (((mask >> t) & 1) == 1) continue;
+				if ((mask & (1 << t)) != 0) continue;
 				
 				if (((mask & taxibit) != taxibit)) {
 					ll newt = tsp_d[s][mask] + T;
@@ -101,10 +107,11 @@ int main() {
 	ll minm = LLINF;
 	for (int v = 1; v < P; ++v) {
 		if (tsp_d[v][mask] != LLINF) {
-			minz = min(minz, tsp_d[v][mask] + d[v][0]);
+			if (d[v][0] != LLINF)
+				minz = min(minz, tsp_d[v][mask] + d[v][0]);
 			minm = min(minm, tsp_d[v][mask] + T);
 		}
-		if (tsp_d[v][mask2] != LLINF)
+		if (tsp_d[v][mask2] != LLINF && d[v][0] != LLINF)
 			minm = min(minm, tsp_d[v][mask2] + d[v][0]);
 	}
 
