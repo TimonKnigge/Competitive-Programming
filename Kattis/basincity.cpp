@@ -7,7 +7,19 @@
 using namespace std;
 
 void readn(register int *n) {
-	cin >> (*n);
+	int sign = 1;
+	register char c;
+	*n = 0;
+	while ((c = getc_unlocked(stdin)) != '\n') {
+		switch (c) {
+			case '-': sign = -1; break;
+			case ' ': goto ex;
+			case '\n': goto ex;
+			default: *n *= 10; *n += c - '0'; break;
+		}
+	}
+ex:
+	*n *= sign;
 }
 
 int main() {
@@ -34,10 +46,10 @@ int main() {
 	bool pos = false;
 	vector<bool> vb(n, false);
 	vector<int> ch;
-	int N = n;
+	int N = n, TL = 1000;
 	while (true) {
 		auto en = chrono::high_resolution_clock::now();
-		if (chrono::duration_cast<chrono::milliseconds>(en-beg).count() > 1750)
+		if (chrono::duration_cast<chrono::milliseconds>(en-beg).count() > TL)
 			break;
 		N = n;
 		
