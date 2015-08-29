@@ -5,11 +5,13 @@
 
 using namespace std;
 
+vector<bool> bs(1e9+2, false);
+
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(NULL);
 	
-	vector<bool> bs(1e9+2, false);
+//	vector<bool> bs(1e9+2, false);
 	
 	int T;
 	cin >> T;
