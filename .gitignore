@@ -1,8 +1,14 @@
 # personal files
 /ignore
 
+# vim
+*.swp
+
 # g++
 *.out
+
+# java
+*.class
 
 # Visual Studio stuff
 *.sln

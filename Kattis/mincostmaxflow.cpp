@@ -32,11 +32,6 @@ struct FlowNetwork {
 };
 
 vector<ll> d;
-struct comp {
-	bool operator()(int i, int j) {
-		return (d[i] != d[j] ? d[i] < d[j] : i != j);
-	}
-};
 
 typedef pair<ll, int> li;
 pair<ll, ll> FlowNetwork::mcmf(int s, int t) {
@@ -59,7 +54,7 @@ pair<ll, ll> FlowNetwork::mcmf(int s, int t) {
 //	}
 //	for (int i = 0; i < V; ++i)
 //		if (d[i] != -1) pot[i] = d[i];
-	
+
 	while (true) {
 		d.assign(V, -1);
 		d[s] = 0;
@@ -68,22 +63,14 @@ pair<ll, ll> FlowNetwork::mcmf(int s, int t) {
 		while (!pq.empty()) {
 			int u = pq.top().second; ll ww = pq.top().first; pq.pop();
 			if (ww > d[u]) continue;
-//		set<int, comp> st;
-//		st.insert(s);
-//		while (!st.empty()) {
-//			int u = *st.begin();
-//			st.erase(st.begin());
 			for (int i = 0; i < int(e[u].size()); ++i) {
 				edge &uv = e[u][i];
 				if (uv.cap == uv.flo) continue;
 				int v = uv.v;
 				ll w = d[u] + uv.cost + pot[u] - pot[v];
 				if (d[v] == -1 || w < d[v]) {
-//					if (st.find(v) != st.end())
-//						st.erase(st.find(v));
-					d[v] = w;
 					p[v] = {u, i};
-//					st.insert(v);
+					d[v] = w;
 					pq.push({d[v], v});
 				}
 			}
