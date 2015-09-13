@@ -27,8 +27,6 @@ using vvii = vector<vii>;
 
 const int INF = 2000000000;
 
-int d1, d2;
-
 int main() {
 	int n;
 	scanf("%d", &n);
@@ -41,7 +39,7 @@ int main() {
 	}
 	
 	sort(p.begin(), p.end(),[&pts](int i, int j) {
-		d1 = pts[i].first / 1e3; d2 = pts[j].first / 1e3;
+		int d1 = pts[i].first / 1e3, d2 = pts[j].first / 1e3;
 		if (d1 != d2) return d1 < d2;
 		else if ((d1&1) == 1) return pts[i].second > pts[j].second;
 		else return pts[i].second < pts[j].second;
