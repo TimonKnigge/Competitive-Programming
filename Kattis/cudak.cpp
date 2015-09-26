@@ -30,7 +30,7 @@ const ll LLINF = 9000000000000000000;
 ll dp[15][136];
 
 ll calc(ll A, ll S) {
-	if (A == 0) return 0;
+	if (A == 0) return (S == 0);
 	
 	vector<int> digit;
 	while (A > 0) { digit.push_back(A % 10); A /= 10; }
