@@ -7,33 +7,51 @@ using namespace std;
 typedef vector<int> vi;
 typedef vector<vi> vvi;
 
-struct S { int l, r, p; };
-bool operator<(const S &lhs, const S &rhs) { 
-	return lhs.l != rhs.l ? lhs.l < rhs.l : lhs.r < rhs.r; 
-}
-bool operator==(const S &lhs, const S &rhs) {
-	return lhs.l == rhs.l && lhs.r == rhs.r;
-}
-
 struct SuffixArray {
 	string s;
 	int n;
 	vvi P;
 	SuffixArray(string &_s) : s(_s), n(_s.length()) { construct(); }
 	void construct() {
-		vector<S> L(n, {0, 0, 0});
 		P.push_back(vi(n, 0));
-		for (int i = 0; i < n; ++i) P[0][i] = int(s[i]);
+		compress();
+		vi occ(n + 1, 0), s1(n, 0), s2(n, 0);
 		for (int k = 1, cnt = 1; cnt / 2 < n; ++k, cnt *= 2) {
 			P.push_back(vi(n, 0));
+			for (int i = 0; i <= n; ++i) occ[i] = 0;
 			for (int i = 0; i < n; ++i)
-				L[i] = { P[k - 1][i], i + cnt < n 
-					? P[k - 1][i + cnt] : -1, i};
-			sort(L.begin(), L.end());
+				occ[i+cnt<n?P[k-1][i+cnt]+1:0]++;
+			for (int i = 0, sum = 0, t; i <= n; ++i) {
+				t = occ[i];
+				occ[i] = sum;
+				sum += t;
+			}
 			for (int i = 0; i < n; ++i)
-				P[k][L[i].p] = (i > 0 && L[i] == L[i - 1]
-				? P[k][L[i - 1].p] : i);
+				s1[occ[i+cnt<n?P[k-1][i+cnt]+1:0]++] = i;
+			for (int i = 0; i <= n; ++i) occ[i] = 0;
+			for (int i = 0; i < n; ++i)
+				occ[P[k-1][s1[i]]]++;
+			for (int i = 0, sum = 0, t; i <= n; ++i) {
+				t = occ[i];
+				occ[i] = sum;
+				sum += t;
+			}
+			for (int i = 0; i < n; ++i)
+				s2[occ[P[k-1][s1[i]]]++] = s1[i];
+			for (int i = 0, p1 = -3, p2 = -3; i < n; ++i) {
+				P[k][s2[i]] = (P[k-1][s2[i]] != p1 || (s2[i]+cnt<n?P[k-1][s2[i]+cnt]:-1) != p2) ? i : P[k][s2[i - 1]];
+				p1 = P[k-1][s2[i]];
+				p2 = s2[i]+cnt<n?P[k-1][s2[i]+cnt]:-1;
+			}
 		}
+	}
+	void compress() {
+		vi cnt(256, 0);
+		for (int i = 0; i < n; ++i) cnt[s[i]]++;
+		for (int i = 0, mp = 0; i < 256; ++i)
+			if (cnt[i] > 0) cnt[i] = mp++;
+		for (int i = 0; i < n; ++i)
+			P[0][i] = cnt[s[i]];
 	}
 	vi &get_array() { return P.back(); }
 };
