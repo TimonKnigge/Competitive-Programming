@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <numeric>
 
 using namespace std;
 
@@ -20,16 +21,16 @@ struct SuffixArray {
 		vi occ(n + 1, 0), s1(n, 0), s2(n, 0);
 		for (int k = 1, cnt = 1; cnt / 2 < n; ++k, cnt *= 2) {
 			P.push_back(vi(n, 0));
-			for (int i = 0; i <= n; ++i) occ[i] = 0;
+			fill(occ.begin(), occ.end(), 0);
 			for (int i = 0; i < n; ++i)
 				occ[i+cnt<n?P[k-1][i+cnt]+1:0]++;
-			for (int i = 1; i <= n; ++i) occ[i] += occ[i - 1];
+			partial_sum(occ.begin(), occ.end(), occ.begin());
 			for (int i = n - 1; i >= 0; --i)
 				s1[--occ[i+cnt<n?P[k-1][i+cnt]+1:0]] = i;
-			for (int i = 0; i <= n; ++i) occ[i] = 0;
+			fill(occ.begin(), occ.end(), 0);
 			for (int i = 0; i < n; ++i)
 				occ[P[k-1][s1[i]]]++;
-			for (int i = 1; i <= n; ++i) occ[i] += occ[i - 1];
+			partial_sum(occ.begin(), occ.end(), occ.begin());
 			for (int i = n - 1; i >= 0; --i)
 				s2[--occ[P[k-1][s1[i]]]] = s1[i];
 			for (int i = 1; i < n; ++i) {
