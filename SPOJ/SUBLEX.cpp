@@ -9,6 +9,8 @@ using namespace std;
 
 using vi = vector<int>;
 using vvi = vector<vi>;
+using ii = pair<int, int>;
+using vii = vector<ii>;
 
 struct SuffixArray {
 	string s;
@@ -23,10 +25,10 @@ struct SuffixArray {
 			P.push_back(vi(n, 0));
 			fill(occ.begin(), occ.end(), 0);
 			for (int i = 0; i < n; ++i)
-				occ[i+cnt<n?P[k-1][i+cnt]+1:0]++;
+				occ[i+cnt<n ? P[k-1][i+cnt]+1 : 0]++;
 			partial_sum(occ.begin(), occ.end(), occ.begin());
 			for (int i = n - 1; i >= 0; --i)
-				s1[--occ[i+cnt<n?P[k-1][i+cnt]+1:0]] = i;
+				s1[--occ[i+cnt<n ? P[k-1][i+cnt]+1 : 0]] = i;
 			fill(occ.begin(), occ.end(), 0);
 			for (int i = 0; i < n; ++i)
 				occ[P[k-1][s1[i]]]++;
@@ -89,23 +91,44 @@ int main() {
 	
 	int Q;
 	cin >> Q;
-	
-	while (Q--) {
-		int K;
-		cin >> K;
-		
-		int l = 0, r = N - 1;
-		while (l < r) {
-			int m = (l + r) / 2;
-			if (prefix[m] >= K) r = m;
-			else l = m + 1;
-		}
-//		while (l > 0 && prefix[l - 1] > K) l--;
-		
-		int pos = arr[l];
-		int cnt = (l > 0 ? K - prefix[l - 1] : K);
-		cout << s.substr(pos, cnt + lcp[l]) << '\n';
+	vii query(Q, {0, 0});
+	for (int i = 0; i < Q; ++i) {
+		cin >> query[i].first;
+		query[i].second = i;
 	}
+	sort(query.begin(), query.end());
+	vii ans(Q, {0, 1});
+	
+	int q = 0;
+	for (int i = 0; i < N; ++i) {
+		while (q < Q && query[q].first <= prefix[i]) {
+			int pos = arr[i];
+			int cnt = query[q].first - (i > 0 ? prefix[i - 1] : 0);
+			ans[query[q].second] = {pos, cnt + lcp[i]};
+			q++;
+		}
+	}
+	
+	for (int i = 0; i < Q; ++i) {
+		cout << s.substr(ans[i].first, ans[i].second) << '\n';
+	}
+	
+//	while (Q--) {
+//		int K;
+//		cin >> K;
+//		
+//		int l = 0, r = N - 1;
+//		while (l < r) {
+//			int m = (l + r) / 2;
+//			if (prefix[m] >= K) r = m;
+//			else l = m + 1;
+//		}
+//		while (l > 0 && prefix[l - 1] > K) l--;
+//		
+//		int pos = arr[l];
+//		int cnt = (l > 0 ? K - prefix[l - 1] : K);
+//		cout << s.substr(pos, cnt + lcp[l]) << '\n';
+//	}
 	cout << flush;
 	
 	return 0;
