@@ -57,9 +57,9 @@ int main() {
 			}
 	}
 	
-	int ans = g;
+	int ans = 0;
 	for (int i = 0; i < g; ++i)
-		if (vis[gx[i]][gy[i]]) ans--;
+		if (!vis[gx[i]][gy[i]]) ans++;
 	printf("%d\n", ans);
 	
 	return 0;
