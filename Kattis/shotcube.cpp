@@ -144,7 +144,7 @@ int main() {
 	map<state, int> st;
 	map<state, state> par;
 	precompute(st, par);
-//	cerr << st.size() << endl;
+	cerr << st.size() << endl;
 
 	int T;
 	scanf("%d", &T);
