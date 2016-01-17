@@ -51,7 +51,7 @@ int main() {
 	
 	ll sqc = ll(sqrt(N)) + 1;
 	
-	ll lowest = M;
+	ll lowest = M + 1;
 	for (ll k = 1; k < sqc; ++k) {
 		ll UP = N / k;
 		if (UP == 0) continue;
