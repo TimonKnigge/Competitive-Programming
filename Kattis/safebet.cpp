@@ -187,19 +187,6 @@ ll sweep(vvii &rowl, vvii &coll, vvi &rowpos, vvi &colpos, map<ii,int> &pos, ii 
 	return ans;
 }
 
-// DEBUG
-void printlines(string n, vvii &hlines) {
-	cerr << n << endl;
-	for (int i = 0; i < hlines.size(); ++i){
-
-	bool b = false;
-		cerr << i<<": ";
-		for (ii v : hlines[i]) {b=true;cerr << v.first << ','<<v.second<<' ';
-		}if(b)cerr << endl;
-	}
-}
-//-DEBUG
-
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(NULL);
@@ -253,11 +240,6 @@ int main() {
 		vvii rhlines, rvlines;
 		run(R - 1, C, LEFT, rowpos, colpos, pos, rhlines, rvlines);
 	
-//		printlines("hlines", hlines);
-//		printlines("vlines", vlines);
-//		printlines("rhlines", rhlines);
-//		printlines("rvlines", rvlines);
-		
 		ii s1, s2;
 		ll ans = 0;
 		ans += sweep(rhlines,  vlines, rowpos, colpos, pos, s1);
