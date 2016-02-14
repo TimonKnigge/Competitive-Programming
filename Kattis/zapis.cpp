@@ -29,7 +29,8 @@ using vvii = vector<vii>;
 const int INF = 2000000000;
 const ll LLINF = 9000000000000000000;
 
-ll MOD = 1e5;
+ll MOD = 1e8;
+vvi dp (201, vi(201, -1LL));
 
 ll count(char l, char r) {
 	if (l == '(') return (r == ')' || r == '?' ? 1LL : 0LL);
@@ -41,17 +42,20 @@ ll count(char l, char r) {
 	return 3LL;
 }
 
-ll calc(ll L, ll R, vvi &dp, string &S) {
+ll calc(ll L, ll R, string &S) {
 	if ((R - L) % 2 == 0LL) return 0LL;
-	if (L > R) return 1LL;
+	if (L > R) return (L == R + 1 ? 1LL : 0LL);
 	if (dp[L][R] != -1LL) return dp[L][R];
 	
-	dp[L][R] = (count(S[L], S[R]) * calc(L + 1, R - 1, dp, S)) % MOD;
-	for (int s = L + 1; s + 1 < R; s += 2) {
-		ll add1 = (count(S[L]  , S[s]) * calc(L + 1, s - 1, dp, S)) % MOD;
-		ll add2 = (count(S[s+1], S[R]) * calc(s + 2, R - 1, dp, S)) % MOD;
+	dp[L][R] = 0LL;
+	for (int s = L + 1; s <= R; s += 2) {
+		ll add1 = (count(S[L]  , S[s]) * calc(L + 1, s - 1, S)) % MOD;
+		ll add2 = (s + 1 < R ? calc(s + 1, R, S) : 1LL);
 		dp[L][R] = (dp[L][R] + add1 * add2) % MOD;
 	}
+	
+	dp[L][R] %= MOD;
+	
 	return dp[L][R];
 }
 
@@ -63,8 +67,18 @@ int main() {
 	string S;
 	cin >> N >> S;
 	
-	vvi dp(N, vi(N, -1LL));
-	cout << calc(0, N - 1, dp, S) << endl;
+	ll ans = calc(0, N - 1, S);
+	if (ans < ll(1e5)) cout << ans << endl;
+	else {
+		ll v = ans % ll(1e5);
+		int d = 0;
+		while (v > 0) {
+			++d;
+			v /= 10;
+		}
+		for (int i = d; i < 5; ++i) cout << '0';
+		cout << (ans % ll(1e5)) << endl;
+	}
 	
 	return 0;
 }
