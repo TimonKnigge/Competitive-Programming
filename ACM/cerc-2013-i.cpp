@@ -195,6 +195,8 @@ void solve() {
 		}
 	}
 	
+	cleanup(tree);
+	
 	cout << swaps.size() << endl;
 	for (size_t i = 0; i < swaps.size(); ++i)
 		cout << 1+swaps[i].first << ' ' << 1+swaps[i].second << '\n';
