@@ -62,21 +62,6 @@ int main() {
 			seq[op + 1][i] = (seq[op+1][i] + seq[op][i - 1]) % MOD;
 		}
 	}
-//	for (int i = 1; i < 2005; ++i) {
-//		if (i&1) seq[0][i] = 0LL;
-//		else {
-//			for (int l = 0; l <= i - 2; ++l)
-//				seq[0][i] = (seq[0][i] + seq[0][l] * seq[0][i - 2 - l]) % MOD;
-//		}
-//	}
-//	for (int op = 1; op < 2005; ++op) {
-//		seq[op][0] = 0LL;
-//		for (int i = 1; i < 2005; ++i) {
-//			for (int l = 0; l < i; ++l)
-//				seq[op][i] = (seq[op][i] + seq[op-1][l] * seq[0][i - l - 1]) % MOD;
-//		}
-//		cerr << op << endl;
-//	}
 	
 	ll ans = 0LL;
 	for (int extra = 0; lopen + ropen + 2 * extra <= N - M; ++extra)
