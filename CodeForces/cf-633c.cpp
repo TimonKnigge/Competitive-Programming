@@ -31,11 +31,12 @@ const int INF = 2000000000;
 const ll LLINF = 9000000000000000000;
 
 int mfunc(char c) { return c - 'a'; }
+
 template <int ALPHABET_SIZE, int (*mp)(char)>
 struct AC_FSM {
 	struct Node {
-		int child[ALPHABET_SIZE], failure = 0;
-		pair<int, int> match = {-1LL, -1LL};
+		int child[ALPHABET_SIZE], failure = 0, match_par = -1;
+		vi match;
 		Node() { for (int i = 0; i < ALPHABET_SIZE; ++i) child[i] = -1; }
 	};
 	vector <Node> a;
@@ -49,8 +50,7 @@ struct AC_FSM {
 				}
 				n = a[n].child[mp(words[w][i])];
 			}
-//			a[n].match.push_back(w);
-			a[n].match = {-1LL, w};
+			a[n].match.push_back(w);
 		}
 
 		queue<int> q;
@@ -63,15 +63,15 @@ struct AC_FSM {
 		}
 		while (!q.empty()) {
 			int r = q.front(); q.pop();
-			for (int k = 0; k < ALPHABET_SIZE; ++k) {
-				if (a[r].child[k] != -1) {
-					q.push(a[r].child[k]);
+			for (int k = 0, arck; k < ALPHABET_SIZE; ++k) {
+				if ((arck = a[r].child[k]) != -1) {
+					q.push(arck);
 					int v = a[r].failure;
 					while (a[v].child[k] == -1) v = a[v].failure;
-					a[a[r].child[k]].failure = a[v].child[k];
-					a[a[r].child[k]].match.first = a[v].child[k];
-//					for (int w : a[a[v].child[k]].match)
-//						a[a[r].child[k]].match.push_back(w);
+					a[arck].failure = a[v].child[k];
+					a[arck].match_par = a[v].child[k];
+					while (a[arck].match_par != -1 && a[a[arck].match_par].match.empty())
+						a[arck].match_par = a[a[arck].match_par].match_par;
 				}
 			}
 		}
@@ -85,15 +85,9 @@ struct AC_FSM {
 				ss = a[ss].failure;
 			state = a[state].child[mp(sentence[i])]
 			      = a[ss].child[mp(sentence[i])];
-			int j = state;
-			while (j != -1LL) {
-				if (a[j].match.second != -1LL)
-					matches[i - words[a[j].match.second].length() + 1].push_back(a[j].match.second);
-				j = a[j].match.first;
-			}
-//			matches[i].push_back(state);
-//			for (int w : a[state].match)
-//				matches[i - words[w].length() + 1].push_back(w);
+			for (ss = state; ss != -1; ss = a[ss].match_par)
+				for (int w : a[ss].match)
+					matches[i + 1 - words[w].length()].push_back(w);
 		}
 	}
 };
@@ -132,10 +126,8 @@ int main() {
 	
 	AC_FSM<26, mfunc> fsm;
 	fsm.construct_automaton(mwords);
-	
 	vvi matches;
 	fsm.aho_corasick(S, mwords, matches);
-	
 	vii par(N + 1, {-1LL, -1LL});
 	par[0] = {-1LL, -2LL};
 	for (int i = 0; i < N; ++i) {
