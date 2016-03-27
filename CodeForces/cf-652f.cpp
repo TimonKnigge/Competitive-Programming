@@ -46,9 +46,6 @@ int main() {
 	vii Si(N, {0LL, 0LL});
 	// final positions
 	vi pos(N, 0LL);
-	// Intersection points with x=1/2 for all lines for t \in [0, M)
-	// Also the slope.
-	vii intercepts(N, {0LL, 0LL});
 	
 	ll shift = 0;
 	for (int i = 0; i < N; ++i) {
@@ -56,24 +53,18 @@ int main() {
 		char c;
 		cin >> x >> c;
 		
-		ll slope = (c == 'L' ? -1 : 1);
+		ll slope = (c == 'L' ? -1 : 1), ic = (slope == 1 ? 1 - x : x);
 		shift += ((T / M) % N) * slope;
+		fix_mod(ic, M);
+		if (ic <= T % M) shift += slope;
 		
 		Si[i] = {x, i};
 		pos[i] = x + (T % M) * slope;
 		fix_mod(pos[i], M);
-		
-		intercepts[i] = {(slope == 1 ? 1 - x : x), slope};
-		fix_mod(intercepts[i].first, M);
 	}
 	
 	sort(Si.begin(), Si.end());
 	sort(pos.begin(), pos.end());
-	sort(intercepts.begin(), intercepts.end());
-	
-	for (int i = 0; i < N && intercepts[i].first <= T % M; ++i) {
-		shift += intercepts[i].second;
-	}
 	fix_mod(shift, N);
 	
 	// Map answers back into the ordering they had in the input
