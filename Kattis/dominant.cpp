@@ -36,39 +36,52 @@ int main() {
 	string s;
 	vector<string> ss;
 	while (getline(cin, s)) ss.push_back(s);
-	while (ss.back().length() == 0) ss.pop_back();
+	while (ss.back().size() == 0) ss.pop_back();
 	
-	int N = ss.size();
-	vvi cnt(26, vi(N, 0));
-	vvi cs(N, vi());
-	for (int i = 0; i < N; ++i) {
-		for (int j = 0; j < int(ss[i].size()); ++j) {
-			int k = int(ss[i][j] - 'a');
-			if (cnt[k][i] == 0) cs[i].push_back(k);
-			cnt[k][i]++;
+	vii sz;
+	for (size_t i = 0; i < ss.size(); ++i) sz.push_back({ss[i].size(), i});
+	sort(sz.rbegin(), sz.rend());
+	
+	vi cnt[26];
+	for (size_t i = 0; i < 26; ++i) cnt[i].assign(ss.size(), 0);
+	vector<vector<char>> owner(ss.size(), vector<char>());
+	vi mask(ss.size(), 0LL);
+	
+	for (size_t i = 0; i < ss.size(); ++i)
+		for (char c : ss[i]) {
+			if ((cnt[c-'a'][i]++) == 0)
+				owner[i].push_back(c);
+			mask[i] = mask[i] | (1<<(c-'a'));
 		}
-	}
 	
-	vector<string> dm;
-	for (int i = 0; i < N; ++i) {
-		bool d = false;
-		for (int j = 0; !d && j < N; ++j) {
-			if (i == j) continue;
-			
-			bool dd = cs[i].size() <= cs[j].size();
-			dd = dd && ss[i].length() < ss[j].length();
-			for (int c = 0; dd && c < int(cs[i].size()); ++c) {
-				dd = dd && cnt[cs[i][c]][i] <= cnt[cs[i][c]][j];
+	vb dom(ss.size(), false);
+	for (size_t l = 0, r = 0; l < ss.size(); l = r) {
+		while (r < ss.size() && sz[r].first == sz[l].first) ++r;
+		for (size_t i = l; i < r; ++i) {
+			int id = sz[i].second;
+			for (size_t j = 0; !dom[id] && j < l; ++j) {
+				if (dom[sz[j].second]) continue;
+				if (owner[id].size() > owner[sz[j].second].size())
+					continue;
+				if ((mask[id]&~mask[sz[j].second]) != 0LL)
+					continue;
+//				cerr << "checking " << id << " against " << sz[j].second << endl;
+				bool d = true;
+				for (char c : owner[id])
+					d = d && cnt[c-'a'][id] <= cnt[c-'a'][sz[j].second];
+				dom[id] = dom[id] || d;
 			}
-			d = d || dd;
 		}
-		if (!d) dm.push_back(ss[i]);
 	}
 	
-	sort(dm.begin(), dm.end());
-	for (int i = 0; i < int(dm.size()); ++i) {
-		cout << dm[i] << '\n';
-	}
+	vi ans;
+	for (size_t i = 0; i < ss.size(); ++i)
+		if (!dom[i]) ans.push_back(i);
+	sort(ans.begin(), ans.end(), [&](ll l, ll r) {
+		return ss[l] < ss[r];
+	});
+	
+	for (ll i : ans) cout << ss[i] << '\n';
 	
 	return 0;
 }
