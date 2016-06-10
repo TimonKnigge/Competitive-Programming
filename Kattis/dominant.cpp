@@ -30,6 +30,8 @@ const int INF = 2000000000;
 const ll LLINF = 9000000000000000000;
 
 int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
 	
 	string s;
 	vector<string> ss;
