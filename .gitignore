@@ -4,8 +4,9 @@
 # vim
 *.swp
 
-# g++
+# g++/in out files
 *.out
+*.in
 
 # java
 *.class
