@@ -11,25 +11,4 @@
 # java
 *.class
 
-# Visual Studio stuff
-*.sln
-*.opensdf
-*.sdf
-*.suo
-*.vcxproj
-*.filters
-*.user
-*.aps
-*.pch
-*.vspscc
-*.vssscc
-*.log
-*.tlog
-*.idb
-*.pdb
-*.obj
-*.lastbuildstate
-*.exe
-*.ilk
-
 */Debug
