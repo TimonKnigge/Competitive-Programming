@@ -105,7 +105,7 @@ int main() {
 	for (int len = 0; len < N; ++len)
 	for (int j = 1, k = len + 1; k < N - 1; ++j, ++k) {
 		for (int i = 0; i < N; ++i) if (i <= j || k <= i)
-		for (int l = 0; l < N; ++l) if (l <= j || k <= l && l != i) {
+		for (int l = 0; l < N; ++l) if ((l <= j || k <= l) && l != i) {
 			bool jfree = j != i && j != l;
 			bool kfree = k != i && k != l;
 			if (j == k) {
