@@ -33,56 +33,6 @@ const ll LLINF = 9000000000000000000;
 void mf(int &v, int w) { if (v < w) v = w; }
 
 int dp[52][52][52][52];
-int f(vi &A, int N, int i, int j, int k, int l) {
-	// Verify i,j,k,l
-	if (i < 0 || j < 0 || k < 0 || l < 0) return 0;
-	if (i >= N || j >= N || k >= N || l >= N) return 0;
-	if (j > k) return 0;
-	
-	bool jfree = j != i && j != l;
-	bool kfree = k != i && k != l;
-
-	if (j == k) {
-		return jfree && kfree && A[i] <= A[k] && A[k] <= A[l];
-	}
-	
-	if (dp[i][j][k][l] != 0)
-		return dp[i][j][k][l];
-	
-	// We are now considering [0..j] + [k..N-1].
-	// The last value left was A[i], rigth was A[l];
-	
-	// Don't use j or k.
-	mf(dp[i][j][k][l], f(A, N, i, j+1, k-1, l));
-	mf(dp[i][j][k][l], f(A, N, i, j, k-1, l));
-	
-	// Don't swap
-	{
-		// Use j.
-		if (jfree && A[i] <= A[j] && A[j] <= A[l])
-			mf(dp[i][j][k][l], 1+f(A, N, j, j+1, k, l));
-		// Use k.
-		if (kfree && A[i] <= A[k] && A[k] <= A[l])
-			mf(dp[i][j][k][l], 1+f(A, N, i, j, k-1, k));
-		// Use j,k.
-		if (jfree && kfree && A[i] <= A[j] && A[j] <= A[k] && A[k] <= A[l])
-			mf(dp[i][j][k][l], 2+f(A, N, j, j+1, k-1, k));
-	}
-	// Swap j and k.
-	if (jfree && kfree) {
-		// Use A[j] on position k, don't use A[k] on position j.
-		if (A[i] <= A[j] && A[j] <= A[l])
-			mf(dp[i][j][k][l], 1+f(A, N, i, j+1, k-1, j));
-		// Use A[k] on position j, don't use A[j] on position k.
-		if (A[i] <= A[k] && A[k] <= A[l])
-			mf(dp[i][j][k][l], 1+f(A, N, k, j+1, k-1, l));
-		// Use both A[k] and A[j], on switched positions.
-		if (A[i] <= A[k] && A[k] <= A[j] && A[j] <= A[l])
-			mf(dp[i][j][k][l], 2+f(A, N, k, j+1, k-1, j));
-	}
-	
-	return dp[i][j][k][l];
-}
 
 int main() {
 	ifstream fin("subrev.in");
@@ -113,7 +63,7 @@ int main() {
 				continue;
 			}
 
-			// We are now considering [0..j] + [k..N-1].
+			// We are now considering [j, k].
 			// The last value left was A[i], rigth was A[l];
 
 			// Don't use j or k.
