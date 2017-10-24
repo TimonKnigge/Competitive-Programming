@@ -5,6 +5,7 @@
 #include <list>
 #include <set>
 #include <map>
+#include <unordered_map>
 #include <queue>
 #include <stack>
 #include <bitset>
@@ -28,7 +29,11 @@ const int INF = 2000000000;
 const ll LLINF = 9000000000000000000;
 
 bool divcon(int lo, int hi, vi &l, vi &r) {
-	if (lo >= hi) return true;
+	if (hi - lo < 3) {
+		bool y = true;
+		for (int i = lo; i < hi; ++i) y = y && r[i] != i + 1;
+		return y;
+	}
 	// Find a unique value in [lo, hi]
 	int midpoint = -1;
 	for (int d = 0; d < hi - lo; ++d) {
@@ -36,7 +41,7 @@ bool divcon(int lo, int hi, vi &l, vi &r) {
 		int j = lo + d;
 		if (l[j] < lo && r[j] > hi) {
 			midpoint = lo + d;
-			 break;
+			break;
 		}
 		j = hi - d;
 		if (l[j] < lo && r[j] > hi) {
@@ -59,19 +64,12 @@ int main() {
 		int n;
 		cin >> n;
 		vi a(n, 0), l(n, -1), r(n, INF);
-		vii s(n, {0, 0});
+		unordered_map<int, int> last;
 		for (int i = 0; i < n; ++i) {
 			cin >> a[i];
-			s[i].first = a[i];
-			s[i].second = i;
-		}
-		sort(s.begin(), s.end());
-		for (int i = 0; i < n; ++i) {
-			int j = s[i].second;
-			if (i > 0 && s[i].first == s[i - 1].first) {
-				l[j] = s[i - 1].second;
-				r[s[i - 1].second] = j;
-			}
+			l[i] = last[a[i]] - 1;
+			if (l[i] >= 0) r[l[i]] = i;
+			last[a[i]] = i + 1;
 		}
 		
 		bool possible = divcon(0, n - 1, l, r);
