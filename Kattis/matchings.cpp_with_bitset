@@ -1,0 +1,63 @@
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+
+using namespace std;
+using namespace __gnu_pbds;
+using ll = long long;
+using ld = long double;
+using ii = pair<ll, ll>;
+using vi = vector<ll>;
+using vvi = vector<vi>;
+using vii = vector<ii>;
+using vvii = vector<vii>;
+
+template<class T>
+using min_heap = priority_queue<T, vector<T>, greater<T>>;
+template<class TIn, class TOut = null_type>
+using order_tree = tree<TIn, TOut, less<TIn>, rb_tree_tag,
+	tree_order_statistics_node_update>;
+
+constexpr int INF = 2000000010;
+constexpr ll LLINF = 9000000000000000010LL;
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+
+	int ci, ri;
+	cin >> ci >> ri;
+	vector<vector<bitset<1000>>> I(2, vector<bitset<1000>>(ri));
+	for (int r = 0; r < ri; ++r)
+		for (int c = 0, v; c < ci; ++c)
+			cin >> v, I[v][r].set(c);
+
+	int cp, rp;
+	cin >> cp >> rp;
+	vector<vector<bitset<1000>>> P(2, vector<bitset<1000>>(rp));
+	for (int r = 0; r < rp; ++r)
+		for (int c = 0, v; c < cp; ++c)
+			cin >> v, P[v][r].set(c);
+	
+	vii bestv;
+	int bestc = 0;
+	for (int c = 0; c + ci <= cp; ++c) {
+		for (int r = 0; r + ri <= rp; ++r) {
+			int v = 0;
+			for (int rm = 0; rm < ri; ++rm)
+				v += (I[0][rm] & P[0][r+rm]).count(),
+				v += (I[1][rm] & P[1][r+rm]).count();
+			if (v == bestc)
+				bestv.push_back({c, r});
+			else if (v > bestc)
+				bestc = v,
+				bestv.assign(1, {c, r});
+		}
+		for (auto &sq : P) for (auto &row : sq) row >>= 1;
+	}
+
+	sort(bestv.begin(), bestv.end());
+	for (const ii &pr : bestv) cout << pr.first << ' ' << pr.second << endl;
+
+	return 0;
+}
