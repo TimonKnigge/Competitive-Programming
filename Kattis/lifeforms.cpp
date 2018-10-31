@@ -1,44 +1,67 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <stack>
-#include <map>
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+
 using namespace std;
+using namespace __gnu_pbds;
+using ll = long long;
+using ld = long double;
+using ii = pair<ll, ll>;
+using vi = vector<ll>;
+using vvi = vector<vi>;
+using vii = vector<ii>;
+using vvii = vector<vii>;
 
-typedef vector<int> vi;
-typedef vector<vi> vvi;
+template<class T>
+using min_heap = priority_queue<T, vector<T>, greater<T>>;
+template<class TIn, class TOut = null_type>
+using order_tree = tree<TIn, TOut, less<TIn>, rb_tree_tag,
+	tree_order_statistics_node_update>;
 
-// suffixarray
-struct S { int l, r, p; };
-bool operator<(const S &lhs, const S &rhs) { 
-	return lhs.l != rhs.l ? lhs.l < rhs.l : lhs.r < rhs.r; 
-}
-bool operator==(const S &lhs, const S &rhs) {
-	return lhs.l == rhs.l && lhs.r == rhs.r;
-}
+constexpr int INF = 2000000010;
+constexpr ll LLINF = 9000000000000000010LL;
 
 struct SuffixArray {
-	string s;
+	vi w;
 	int n;
 	vvi P;
-	SuffixArray(string &_s) : s(_s), n(_s.length()) { construct(); }
+	SuffixArray(vi &_w) : w(_w), n(w.size()) { construct(); }
 	void construct() {
-		vector<S> L(n, {0, 0, 0});
-		P.push_back(vi(n, 0));
-		for (int i = 0; i < n; ++i) P[0][i] = int(s[i]);
+		P.push_back(vi(n, 0)); compress();
+		vi occ(n + 1, 0), s1(n, 0), s2(n, 0);
 		for (int k = 1, cnt = 1; cnt / 2 < n; ++k, cnt *= 2) {
 			P.push_back(vi(n, 0));
+			fill(occ.begin(), occ.end(), 0);
 			for (int i = 0; i < n; ++i)
-				L[i] = { P[k - 1][i], i + cnt < n 
-					? P[k - 1][i + cnt] : -1000, i};
-			sort(L.begin(), L.end());
+				occ[i+cnt<n ? P[k-1][i+cnt]+1 : 0]++;
+			partial_sum(occ.begin(), occ.end(), occ.begin());
+			for (int i = n - 1; i >= 0; --i)
+				s1[--occ[i+cnt<n ? P[k-1][i+cnt]+1 : 0]] = i;
+			fill(occ.begin(), occ.end(), 0);
 			for (int i = 0; i < n; ++i)
-				P[k][L[i].p] = (i > 0 && L[i] == L[i - 1]
-				? P[k][L[i - 1].p] : i);
+				occ[P[k-1][s1[i]]]++;
+			partial_sum(occ.begin(), occ.end(), occ.begin());
+			for (int i = n - 1; i >= 0; --i)
+				s2[--occ[P[k-1][s1[i]]]] = s1[i];
+			for (int i = 1; i < n; ++i) {
+				P[k][s2[i]] = same(s2[i], s2[i - 1], k, cnt) 
+					? P[k][s2[i - 1]] : i;
+			}
 		}
 	}
-	vi &get_array() { return P.back(); }
+	void compress() {
+		vi cnt(256, 0);
+		for (int i = 0; i < n; ++i) cnt[w[i]]++;
+		for (int i = 0, mp = 0; i < 256; ++i)
+			if (cnt[i] > 0) cnt[i] = mp++;
+		for (int i = 0; i < n; ++i) P[0][i] = cnt[w[i]];
+	}
+	bool same(int i, int j, int k, int l) {
+		return P[k - 1][i] == P[k - 1][j]
+			&& (i + l < n ? P[k - 1][i + l] : -1)
+			== (j + l < n ? P[k - 1][j + l] : -1);
+	}
+	const vi &get_array() { return P.back(); }
 	int lcp(int x, int y) {
 		int ret = 0;
 		if (x == y) return n - x;
@@ -51,79 +74,88 @@ struct SuffixArray {
 		return ret;
 	}
 };
-// -suffixarray
 
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(NULL);
 
 	int n;
-	while (true) {
-		cin >> n;
+	bool e = false;
+	while (cin >> n) {
 		if (n == 0) break;
-		
 
-		map<int, int> mp;
-		string s, t;
-		cin >> s;
-		mp.insert({s.length(), 0});
-		for (int i = 1; i < n; ++i) {
-			cin >> t;
-			s = s + char(int('z') + i) + t;
-			mp.insert({s.length(), i});
+		if (e) cout << '\n'; else e = true;
+
+		// Special cases
+		if (n == 1) {
+			string s;
+			cin >> s;
+			cout << s << "\n";
+			continue;
 		}
 
-		SuffixArray sa(s);
-		vector<int> inv(s.length(), 0), &arr = sa.get_array();
-		for (int i = 0; i < arr.size(); ++i)
-			inv[arr[i]] = i;
+		vi word, owner;
+		int ntok = 26;
+		for (int i = 0; i < n; ++i) {
+			string s;
+			cin >> s;
+			for (char c : s)
+				word.push_back(c-'a');
+			word.push_back(ntok++);
+			owner.push_back((int)word.size());
+		}
 
-		vector<int> cm;
-		int L = 0;
-		map<int, int> diff;
-		int l = 0, r = 0; // [l, r]
-		for (; r < s.length(); ++r) {
-//			cerr << "[" << l << ", " << r << "]"<<endl;
-			// add r
-			int id = mp.lower_bound(inv[r])->second;
-			if (diff.find(id) == diff.end())
-				diff.insert({id, 1});
-			else
-				diff[id]++;
+		int S = (int)word.size();
+
+		SuffixArray sa(word);
+		const vi &p = sa.get_array();
+		vi pi(S), po(S);
+		for (int i = 0, o = 0; i < (int)word.size(); ++i) {
+			if (owner[o] <= i) ++o;
+			pi[p[i]] = i;
+			po[p[i]] = o;
+		}
+
+		vi ans, have(n, 0);
+		int len = 0, havet = 0;
+		for (int l = 0, r = 0; r < S; ++r) {
+			// add r.
+			if (!have[po[r]])
+				++havet;
+			++have[po[r]];
 			
-			// while there are enough thingies, record and remove l
-			while (diff.size() > n / 2) {
-				int lcp = sa.lcp(inv[l], inv[r]);
-				if (lcp > L) {
-					L = lcp;
-					cm.clear();
-					cm.push_back(inv[l]);
-				} else if (lcp == L && L != 0)
-					cm.push_back(inv[l]);
-				// remove l
-				int id2 = mp.lower_bound(inv[l])->second;
-				auto it = diff.find(id2);
-				if (it->second > 1) it->second--;
-				else diff.erase(it);
-				l++;	
+			// move l.
+			while (l < r && (have[po[l]] > 1 || (havet - 1) > n/2)) {
+				--have[po[l]];
+				if (have[po[l]] == 0) --havet;
+				l++;
 			}
+
+			if (havet <= n/2) continue;
+			
+			// increase ans.
+			int tlen = sa.lcp(pi[l], pi[r]);
+			if (tlen > len)
+				len = tlen,
+				ans.clear();
+			if (tlen == len && (ans.size() == 0 || 
+				(sa.lcp(pi[l], ans.back()) < len)
+					))
+				ans.push_back(pi[l]);
 		}
-		
-		if (cm.size() == 0) cout << "?" << endl;
+
+		if (len == 0)
+			cout << "?\n";
 		else {
-			string last = " ", nw = "";
-			for (int i = 0; i < cm.size(); ++i) {
-				nw = "";
-				for (int j = 0; j < L; ++j)
-					nw = nw + s[cm[i] + j];
-				if (nw == last) continue;
-				last = nw;
-				cout << nw << '\n';
+			for (int i : ans) {
+				for (int j = i; j < i+len; ++j)
+					cout << char('a'+word[j]);
+				cout << '\n';
 			}
-			cout << endl;
 		}
 	}
+
+	cout << flush;
 	
 	return 0;
 }
-
