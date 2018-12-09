@@ -1,120 +1,117 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <functional>
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
 
 using namespace std;
+using namespace __gnu_pbds;
+using ll = long long;
+using ld = long double;
+using ii = pair<ll, ll>;
+using vi = vector<ll>;
+using vvi = vector<vi>;
+using vii = vector<ii>;
+using vvii = vector<vii>;
+using vd = vector<ld>;
 
-typedef long long ll;
+template<class T>
+using min_heap = priority_queue<T, vector<T>, greater<T>>;
+template<class TIn, class TOut = null_type>
+using order_tree = tree<TIn, TOut, less<TIn>, rb_tree_tag,
+	tree_order_statistics_node_update>;
+// .find_by_order(int r) and .order_of_key(TIn v)
 
-struct point { ll x, y; };
-bool operator==(const point &l, const point &r) {
-	return l.x == r.x && l.y == r.y; }
+constexpr int INF = 2000000010;
+constexpr ll LLINF = 9000000000000000010LL;
+constexpr ld PI = acos(-1);
 
-ll dsq(const point &p1, const point &p2) {
-	return (p1.x - p2.x)*(p1.x - p2.x) + (p1.y - p2.y)*(p1.y - p2.y); }
-ll det(ll x1, ll y1, ll x2, ll y2) {
-	return x1 * y2 - x2 * y1; }
-ll det(const point &p1, const point &p2, const point &d) {
-	return det(p1.x - d.x, p1.y - d.y, p2.x - d.x, p2.y - d.y); }
-bool comp_lexo(const point &l, const point &r) { 
-	return l.y != r.y ? l.y < r.y : l.x < r.x; }
-bool comp_angl(const point &l, const point &r, const point &c) {
-	ll d = det(l, r, c);
-	if (d != 0) return d > 0;
-	else return dsq(c, l) < dsq(c, r);
+using C = ll;	// could be long long or long double
+constexpr C EPS = 0LL;	// change to 0 for C=ll
+struct P {		// may also be used as a 2D vector
+	C x, y;
+	P(C x = 0, C y = 0) : x(x), y(y) {}
+	P operator+ (const P &p) const { return {x + p.x, y + p.y}; }
+	P operator- (const P &p) const { return {x - p.x, y - p.y}; }
+	P operator* (C c) const { return {x * c, y * c}; }
+	P operator/ (C c) const { return {x / c, y / c}; }
+	C operator* (const P &p) const { return x*p.x + y*p.y; }
+	C operator^ (const P &p) const { return x*p.y - p.x*y; }
+	P perp() const { return P{y, -x}; }
+	C lensq() const { return x*x + y*y; }
+	ld len() const { return sqrt((ld)lensq()); }
+	static ld dist(const P &p1, const P &p2) {
+		return (p1-p2).len(); }
+	bool operator==(const P &r) const {
+		return ((*this)-r).lensq() <= EPS*EPS; }
+	bool operator!=(const P &r) const { return !(*this==r); }
+};
+C det(P p1, P p2) { return p1^p2; }
+C det(P p1, P p2, P o) { return det(p1-o, p2-o); }
+C det(const vector<P> &ps) {
+	C sum = 0; P prev = ps.back();
+	for(auto &p : ps) sum += det(p, prev), prev = p;
+	return sum;
 }
+// Careful with division by two and C=ll
+C area(P p1, P p2, P p3) { return abs(det(p1, p2, p3))/C(2); }
+C area(const vector<P> &poly) { return abs(det(poly))/C(2); }
+int sign(C c){ return (c > C(0)) - (c < C(0)); }
+int ccw(P p1, P p2, P o) { return sign(det(p1, p2, o)); }
 
 struct ConvexHull {
-	vector<point> &p;
-	vector<int> h;	// incides of the hull in p, ccw
-	ConvexHull(vector<point> &_p) : p(_p) { compute_hull(); }
+	size_t n;
+	vector<size_t> h, c; // Indices of the hull are in `h`, counter clockwise.
+	const vector<P> &p;
+	ConvexHull(const vector<P> &_p) : n(_p.size()), c(n), p(_p) { compute_hull(); }
 	void compute_hull() {
-		int pivot = 0, n = p.size();
-		vector<int> ps(n + 1, 0);
-		for (int i = 1; i < n; ++i) {
-			ps[i] = i;
-			if (comp_lexo(p[i], p[pivot])) pivot = i;
-		}
-		ps[0] = ps[n] = pivot; ps[pivot] = 0;
-		sort(ps.begin()+1, ps.end()-1, [this, &pivot](int l, int r) {
-			return comp_angl(p[l], p[r], p[pivot]); });
-		
-		h.push_back(ps[0]);
-		size_t i = 1; ll d;
-		while (i < ps.size()) {
-			if (p[ps[i]] == p[h.back()]) { i++; continue; }
-			if (h.size() < 2 || ((d = det(p[h.end()[-2]],
-				p[h.back()], p[ps[i]])) > 0)) { // >= for col.
-				h.push_back(ps[i]);
-				i++; continue;
+		std::iota(c.begin(), c.end(), 0);
+		std::sort(c.begin(), c.end(), [this](size_t l, size_t r) -> bool {
+			return p[l].x != p[r].x ? p[l].x < p[r].x : p[l].y < p[r].y; });
+		c.erase(std::unique(c.begin(), c.end(), [this](size_t l, size_t r) {
+			return p[l] == p[r]; }), c.end());
+		for (size_t s = 1, r = 0; r < 2; ++r, s = h.size()) {
+			for (size_t i : c) {
+				while (h.size() > s && ccw(p[h.end()[-2]], p[h.end()[-1]], p[i]) <= 0)
+					h.pop_back();
+				h.push_back(i);
 			}
-			if (p[h.end()[-2]] == p[ps[i]]) { i++; continue; }
-			h.pop_back();
-			if (d == 0) h.push_back(ps[i]);
+			reverse(c.begin(), c.end());
 		}
-		if (h.size() > 1 && h.back() == pivot) h.pop_back();
+		if (h.size() > 1) h.pop_back();
+	}
+	size_t size() const { return h.size(); }
+	template <class T, void U(const P&, const P&, const P&, T&)>
+	void rotating_calipers(T &ans) {
+		if (size() <= 2) U(p[h.front()], p[h.back()], p[h.back()], ans); else
+		for (size_t i = 0, j = 1, s = size(); i < 2*s; ++i) {
+			while (ccw(p[h[(i+1)%s]] - p[h[i%s]], p[h[(j+1)%s]] - p[h[j]], P{0,0}) >= 0)
+				j = (j+1)%s;
+			U(p[h[i%s]], p[h[(i+1)%s]], p[h[j]], ans);
+		}
 	}
 };
-
-// Note: if h.size() is small, consider bruteforcing to avoid
-// the usual nasty computational-geometry-edge-cases.
-long double rotating_calipers(vector<point> &p, vector<int> &h) {
-	long double best = 0.0;
-	int n = h.size(), i = 0, j = 1 % n, a = 1 % n, b = 2 % n;
-	while (i < n) {
-		// >= 0 => move a
-		// < 0  => move i
-		if (det(p[h[j]].x - p[h[i]].x, p[h[j]].y - p[h[i]].y,
-			p[h[b]].x - p[h[a]].x, p[h[b]].y - p[h[a]].y) >= 0) {
-			a = (a + 1) % n;
-			b = (b + 1) % n;
-		} else {
-			i++; // Not %n !!
-			j = (j + 1) % n;
-		}
-
-//		cout << i << ' ' << j << ' ' << a << ' '  << b << endl;
-
-		// Make computations on the pairs:
-		// 	h[i%n], h[a]
-		//	h[j], h[a]
-		long double ia = sqrt((long double)(dsq(p[h[i%n]], p[h[a]])));
-		long double ja = sqrt((long double)(dsq(p[h[j]], p[h[a]])));
-		if (ia > best) best = ia;
-		if (ja > best) best = ja;
-	}
-	return best;
+// Example: furthest points.
+void update(const P &p1, const P &p2, const P &o, ll &ans) {
+	ans = max(ans, max((p1-o).lensq(), (p2-o).lensq()));
 }
+constexpr ld LDINF = 1e300;
 
+void solve() {
+	int N;
+	cin >> N;
+	vector<P> pts(N);
+	for (P &p : pts) cin >> p.x >> p.y;
+	ConvexHull ch(pts);
+	ll ans = 0LL;
+	ch.rotating_calipers<ll, update>(ans);
+	printf("%.14lf\n", sqrt(ans));
+}
 
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(NULL);
+	cout << fixed << setprecision(12);
 	
-	int n;
-	scanf("%d", &n);
-		
-	vector<point> pts;
-	for (int i = 0; i < n; ++i) {
-		ll x, y;
-		scanf("%lld", &x);
-		scanf("%lld", &y);
-		pts.push_back({x, y});
-	}
-	
-	ConvexHull ch(pts);
-	long double ans = 0.0;
-	if (ch.h.size() < 4) {
-		for (int i = 0; i < ch.h.size(); ++i)
-			for (int j = 0; j < ch.h.size(); ++j) {
-				long double d = sqrt((long double)
-					dsq(pts[ch.h[i]], pts[ch.h[j]]));
-				if (d > ans) ans = d;
-			}
-	} else ans = rotating_calipers(pts, ch.h);
-	printf("%.8lf\n", double(ans));
+	solve();
 	
 	return 0;
 }
-
