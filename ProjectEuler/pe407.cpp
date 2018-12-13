@@ -40,6 +40,7 @@ void solve() {
 				if (d1*d2 <= n && x < d1*d2 && x > ans[d1*d2])
 					ans[d1*d2] = x;
 
+	ans[1] = 0;
 	cout << std::accumulate(ans.begin()+1, ans.begin()+n+1, 0LL) << endl;
 }
 
